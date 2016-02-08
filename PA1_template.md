@@ -1,157 +1,151 @@
----
-title: "repres_ass1"
-author: "Chen"
-date: "February 5, 2016"
-output: html_document
----
+This is an R Markdown document for "Reproducible Research course",
+assignment 1.
 
-This is an R Markdown document for "Reproducible Research course", assignment 1.
-
-```{r}
-library(lubridate)
-library(psych)
-```
+    library(lubridate)
+    library(psych)
 
 1.Loading and preprocessing the data.
 
     a.Load the data (i.e. read.csv())
         I just download the data and unzip it to my work directory
 
-```{r}
-ass1_data = read.csv("C:/Users/bigwmz/Documents/Reproducible Research/activity.csv")
-```
+    ass1_data = read.csv("C:/Users/bigwmz/Documents/Reproducible_Research/activity.csv")
 
     b.Process/transform the data (if necessary) into a format suitable for your analysis
         NO need.
-
 
 2.What is mean total number of steps taken per day?
 
     a.Make a histogram of the total number of steps taken each day
         I Calculated the total number of steps taken everyday and then Generated the Histogram.
 
-```{r}
-daily_total <- aggregate(steps~date, data=ass1_data, FUN=sum, na.rm=TRUE)
-hist(daily_total$steps)
-```
+    daily_total <- aggregate(steps~date, data=ass1_data, FUN=sum, na.rm=TRUE)
+    hist(daily_total$steps)
+
+![](PA1_template_files/figure-markdown_strict/unnamed-chunk-3-1.png)<!-- -->
 
     b.Calculate and report the mean and median total number of steps taken per day
 
-```{r}
-mean(daily_total$steps)
-median(daily_total$steps)
-```
+    mean(daily_total$steps)
+
+    ## [1] 10766.19
+
+    median(daily_total$steps)
+
+    ## [1] 10765
 
 3.What is the average daily activity pattern?
 
     a.Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of      steps taken, averaged across all days (y-axis)
         generated the mean of each 5-minute interval and use the funtion plot() to make the time series plot
 
-```{r}
-five_min_avg <- aggregate(steps~interval, data=ass1_data, FUN=mean, na.rm=TRUE)
-plot(x = five_min_avg$interval, y = five_min_avg$steps, type = "l")
-```
+    five_min_avg <- aggregate(steps~interval, data=ass1_data, FUN=mean, na.rm=TRUE)
+    plot(x = five_min_avg$interval, y = five_min_avg$steps, type = "l")
+
+![](PA1_template_files/figure-markdown_strict/unnamed-chunk-5-1.png)<!-- -->
 
     b.Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of     steps?
         find the maximum number of steps with funtion max(). 
 
-```{r}
-max_steps<- max(five_min_avg$steps)
-for (i in 1:288) 
-{
-    if (five_min_avg$steps[i] == max_steps)
-        five_minute_int <- five_min_avg$interval[i]
-}
-five_minute_int
-```
+    max_steps<- max(five_min_avg$steps)
+    for (i in 1:288) 
+    {
+        if (five_min_avg$steps[i] == max_steps)
+            five_minute_int <- five_min_avg$interval[i]
+    }
+    five_minute_int
+
+    ## [1] 835
 
 4.Imputing missing values
 
     a.Calculate and report the total number of missing values in the dataset
 
-```{r}    
-na <- 0
-for (i in 1:17568)
-{
-    if(is.na(ass1_data$steps[i])) 
-        na <- na+1 
-}
-na
-```
+    na <- 0
+    for (i in 1:17568)
+    {
+        if(is.na(ass1_data$steps[i])) 
+            na <- na+1 
+    }
+    na
+
+    ## [1] 2304
 
     b.Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need      to be sophisticated. For example, you could use the mean/median for that day, or the mean for that           5-minute interval, etc.
         with the mean of that 5 minute interval
     c.Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-```{r}        
-ass1_data_new <- ass1_data
-for (i in 1:17568) 
-{
-    if(is.na(ass1_data_new$steps[i])) 
-    { 
-        five_min_in <- ass1_data_new$interval[i] 
-        for (j in 1:288)  
-        {
-            if (five_min_avg$interval[j] == five_min_in) 
-                ass1_data_new$steps[i] <- five_min_avg$steps[j] 
+    ass1_data_new <- ass1_data
+    for (i in 1:17568) 
+    {
+        if(is.na(ass1_data_new$steps[i])) 
+        { 
+            five_min_in <- ass1_data_new$interval[i] 
+            for (j in 1:288)  
+            {
+                if (five_min_avg$interval[j] == five_min_in) 
+                    ass1_data_new$steps[i] <- five_min_avg$steps[j] 
 
+            }
         }
     }
-}
-```
 
     d.Make a histogram of the total number of steps taken each day and Calculate and report the mean and        median total number of steps taken per day. Do these values differ from the estimates from the first        part of the assignment? What is the impact of imputing missing data on the estimates of the total daily     number of steps?
-    
-```{r}
-daily_total_new <- aggregate(steps~date, data=ass1_data_new, FUN=sum, na.rm=TRUE)
-hist(daily_total_new$steps)
-```
 
-```{r}
-mean(daily_total_new$steps)
-median(daily_total_new$steps)
-```
+    daily_total_new <- aggregate(steps~date, data=ass1_data_new, FUN=sum, na.rm=TRUE)
+    hist(daily_total_new$steps)
+
+![](PA1_template_files/figure-markdown_strict/unnamed-chunk-9-1.png)<!-- -->
+
+    mean(daily_total_new$steps)
+
+    ## [1] 10766.19
+
+    median(daily_total_new$steps)
+
+    ## [1] 10766.19
 
         Mean did not change and median now is closer to the Mean.
         
-5.Are there differences in activity patterns between weekdays and weekends?
+
+5.Are there differences in activity patterns between weekdays and
+weekends?
 
     a.Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating          whether a given date is a weekday or weekend day.
-    
-```{r}
-x <- wday(ass1_data_new$date)
-y <- x
-for (i in 1:17568) 
-{
-    if(x[i] == 1)
-        y[i] <- 'weekend'
-    if(x[i] == 2)
-        y[i] <- 'weekday'
-    if(x[i] == 3)
-        y[i] <- 'weekday'
-    if(x[i] == 4)
-        y[i] <- 'weekday'
-    if(x[i] == 5)
-        y[i] <- 'weekday'
-    if(x[i] == 6)
-        y[i] <- 'weekday'
-    if(x[i] == 7)
-        y[i] <- 'weekend'
-}
-ass1_data_new$weekday <-y
 
-```
-    
+    x <- wday(ass1_data_new$date)
+    y <- x
+    for (i in 1:17568) 
+    {
+        if(x[i] == 1)
+            y[i] <- 'weekend'
+        if(x[i] == 2)
+            y[i] <- 'weekday'
+        if(x[i] == 3)
+            y[i] <- 'weekday'
+        if(x[i] == 4)
+            y[i] <- 'weekday'
+        if(x[i] == 5)
+            y[i] <- 'weekday'
+        if(x[i] == 6)
+            y[i] <- 'weekday'
+        if(x[i] == 7)
+            y[i] <- 'weekend'
+    }
+    ass1_data_new$weekday <-y
+
     b.Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis)       and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
-    
-```{r}
-weekday <- grep("weekday",ass1_data_new$weekday)
-week_day <- ass1_data_new[weekday,]
-week_end <- ass1_data_new[-weekday,]
-five_min_avg_d <- aggregate(steps~interval, data=week_day, FUN=mean, na.rm=TRUE)
-five_min_avg_e <- aggregate(steps~interval, data=week_end, FUN=mean, na.rm=TRUE)
 
-plot(x = five_min_avg_d$interval, y = five_min_avg_d$steps, type = "l") 
-plot(x = five_min_avg_e$interval, y = five_min_avg_e$steps, type = "l") 
-```
+    weekday <- grep("weekday",ass1_data_new$weekday)
+    week_day <- ass1_data_new[weekday,]
+    week_end <- ass1_data_new[-weekday,]
+    five_min_avg_d <- aggregate(steps~interval, data=week_day, FUN=mean, na.rm=TRUE)
+    five_min_avg_e <- aggregate(steps~interval, data=week_end, FUN=mean, na.rm=TRUE)
 
+    plot(x = five_min_avg_d$interval, y = five_min_avg_d$steps, type = "l") 
+
+![](PA1_template_files/figure-markdown_strict/unnamed-chunk-12-1.png)<!-- -->
+
+    plot(x = five_min_avg_e$interval, y = five_min_avg_e$steps, type = "l") 
+
+![](PA1_template_files/figure-markdown_strict/unnamed-chunk-12-2.png)<!-- -->
